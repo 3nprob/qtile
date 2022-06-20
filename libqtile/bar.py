@@ -167,6 +167,7 @@ class Bar(Gap, configurable.Configurable):
         ("margin", 0, "Space around bar as int or list of ints [N E S W]."),
         ("border_color", "#000000", "Border colour as str or list of str [N E S W]"),
         ("border_width", 0, "Width of border as int of list of ints [N E S W]"),
+        ("widget_padding", 0, "Space between each widget"),
     ]
 
     def __init__(self, widgets, size, **config):
@@ -465,12 +466,12 @@ class Bar(Gap, configurable.Configurable):
             offset = self.border_width[3]
             for i in widgets:
                 i.offsetx = offset
-                offset += i.length
+                offset += i.length + self.widget_padding
         else:
             offset = self.border_width[0]
             for i in widgets:
                 i.offsety = offset
-                offset += i.length
+                offset += i.length + self.widget_padding
 
     def get_widget_in_position(self, x: int, y: int) -> _Widget | None:
         if self.horizontal:
