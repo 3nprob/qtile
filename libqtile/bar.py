@@ -327,7 +327,7 @@ class Bar(Gap, configurable.Configurable):
         self._configured = True
         self._add_strut = False
 
-    def _configure_widget(self, widget):
+    def _configure_widget(self, widget: _Widget):
         configured = True
 
         if widget.supported_backends and (self.qtile.core.name not in widget.supported_backends):
