@@ -813,6 +813,10 @@ class Core(base.Core, wlrq.HasListeners):
 
         logger.debug("Focussing new window")
         if surface.is_xdg_surface and isinstance(win.surface, XdgSurface):
+            logger.debug("XX1 %s", win.surface.toplevel.app_id)
+            # TODO: override app_id / wm_class in parent
+            win._wm_class = win.surface.toplevel.app_id
+            win.ftm_handle.set_app_id(win._wm_class or "")
             win.surface.set_activated(True)
             win.ftm_handle.set_activated(True)
 

@@ -23,6 +23,7 @@ from __future__ import annotations
 import abc
 import functools
 import typing
+import json
 
 import cairocffi
 import pywayland
@@ -633,6 +634,8 @@ class XdgWindow(Window[XdgSurface]):
         Window.__init__(self, core, qtile, surface)
 
         self._wm_class = surface.toplevel.app_id
+        logger.debug("HERP: %s", surface.toplevel.app_id)
+        #logger.debug("DERP: %s", json.dumps(surface.__dict__))
         self.popups: list[XdgPopupWindow] = []
         self.subsurfaces: list[SubSurface] = []
 
@@ -654,7 +657,7 @@ class XdgWindow(Window[XdgSurface]):
         if self in self.core.pending_windows:
             self.core.pending_windows.remove(self)
             self._wid = self.core.new_wid()
-            logger.debug("Managing new top-level window with window ID: %s", self._wid)
+            logger.debug("Managing new top-level window with window ID: %s, app_id: %s", self._wid, self._wm_class)
 
             # Save the client's desired geometry
             surface = self.surface
