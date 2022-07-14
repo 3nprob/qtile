@@ -77,7 +77,7 @@ from xkbcommon import xkb
 
 from libqtile import hook, log_utils
 from libqtile.backend import base
-from libqtile.backend.wayland import inputs, window, wlrq, xdgwindow, xwindow
+from libqtile.backend.wayland import inputs, layer, window, wlrq, xdgwindow, xwindow
 from libqtile.backend.wayland.output import Output
 from libqtile.log_utils import logger
 
@@ -504,7 +504,7 @@ class Core(base.Core, wlrq.HasListeners):
         assert self.qtile is not None
 
         wid = self.new_wid()
-        win = window.LayerStatic(self, self.qtile, layer_surface, wid)
+        win = layer.LayerStatic(self, self.qtile, layer_surface, wid)
         logger.info("Managing new layer_shell window with window ID: %s", wid)
         self.qtile.manage(win)
 
@@ -781,12 +781,11 @@ class Core(base.Core, wlrq.HasListeners):
         if self.focused_internal:
             self.focused_internal = None
 
-        if isinstance(win, window.LayerStatic):
+        if isinstance(win, layer.LayerStatic):
             if not win.surface.current.keyboard_interactive:
                 return
 
         if isinstance(win, (xwindow.XWindow, xwindow.XStatic)):
-        #if isinstance(win, (xwindow.XWindow, xwindow.XStatic)) and isinstance(win.surface, xwayland.Surface):
             if not win.surface.or_surface_wants_focus():
                 return
 

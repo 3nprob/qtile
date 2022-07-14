@@ -21,17 +21,20 @@
 from __future__ import annotations
 
 import typing
+
 from pywayland import lib as wllib, ffi as wlffi
 from pywayland.server.listener import Listener
 
 from wlroots import ffi
 from wlroots.util.box import Box
+from wlroots.util.edges import Edges
 from wlroots.wlr_types.xdg_shell import XdgPopup, XdgSurface, XdgTopLevelSetFullscreenEvent
 
 from libqtile import hook
 from libqtile.backend import base
 from libqtile.backend.base import FloatStates
-from libqtile.backend.wayland.window import EDGES_TILED, Static, SubSurface, Window
+from libqtile.backend.wayland.layer import SubSurface
+from libqtile.backend.wayland.window import Static, Window
 from libqtile.backend.wayland.wlrq import HasListeners
 from libqtile.log_utils import logger
 
@@ -44,6 +47,9 @@ if typing.TYPE_CHECKING:
     from libqtile.backend.wayland.output import Output
     from libqtile.core.manager import Qtile
     from libqtile.utils import ColorsType
+
+EDGES_TILED = Edges.TOP | Edges.BOTTOM | Edges.LEFT | Edges.RIGHT
+
 
 class XdgWindow(Window[XdgSurface]):
     """An Wayland client connecting via the xdg shell."""
@@ -68,7 +74,9 @@ class XdgWindow(Window[XdgSurface]):
             subsurface.finalize()
 
     def _on_map(self, _listener: Listener, _data: Any) -> None:
-        logger.debug("Signal: xdgwindow map")
+        logger.debug("Signal: xdgwindow map app_id: %s", self.surface.toplevel.app_id)
+        if not self._wm_class == self.surface.toplevel.app_id:
+            self._wm_class = self.surface.toplevel.app_id
 
         if self in self.core.pending_windows:
             self.core.pending_windows.remove(self)
@@ -372,6 +380,7 @@ class XdgStatic(Static[XdgSurface]):
         self._wm_class = self.surface.toplevel.app_id
         self.ftm_handle.set_app_id(self._wm_class or "")
 
+
 class XdgPopupWindow(HasListeners):
     """
     This represents a single `struct wlr_xdg_popup` object and is owned by a single
@@ -433,4 +442,3 @@ class XdgPopupWindow(HasListeners):
 
     def _on_commit(self, _listener: Listener, _data: Any) -> None:
         self.output.damage()
-
